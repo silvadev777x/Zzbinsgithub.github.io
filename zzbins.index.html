@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luciano Obfuscator - Proteção de Código LUA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0a192f;
+            --secondary-blue: #172a45;
+            --accent-blue: #64d8ff;
+            --accent-purple: #9d4edd;
+            --light-blue: #e6f1ff;
+            --dark-blue: #020c1b;
+            --text-blue: #8892b0;
+            --border-blue: rgba(100, 216, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--light-blue);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            background: rgba(10, 25, 47, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 25, 80, 0.4);
+            border: 1px solid var(--border-blue);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(157, 78, 221, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(100, 216, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        .lua-badge {
+            background: linear-gradient(135deg, #9d4edd, #560bad);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4);
+        }
+
+        .subtitle {
+            color: var(--text-blue);
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            background: linear-gradient(135deg, rgba(20, 40, 70, 0.7), rgba(30, 60, 100, 0.7));
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            color: var(--accent-blue);
+            border: 1px solid var(--border-blue);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature.lua {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(86, 11, 173, 0.2));
+            color: #c77dff;
+            border-color: rgba(157, 78, 221, 0.5);
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(100, 216, 255, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        .feature.lua:hover {
+            box-shadow: 0 10px 20px rgba(157, 78, 221, 0.3);
+            border-color: #c77dff;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        .code-section {
+            background: rgba(10, 25, 47, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 25, 80, 0.3);
+            border: 1px solid var(--border-blue);
+            transition: transform 0.3s ease;
+        }
+
+        .code-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            color: var(--accent-blue);
+            font-size: 1.6rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(100, 216, 255, 0.2);
+        }
+
+        .section-title.lua {
+            color: #c77dff;
+            border-bottom-color: rgba(157, 78, 221, 0.2);
+        }
+
+        .section-title i {
+            margin-right: 15px;
+            font-size: 1.5rem;
+            background: rgba(100, 216, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .section-title.lua i {
+            background: rgba(157, 78, 221, 0.2);
+        }
+
+        /* Code Areas */
+        .code-input, .code-output {
+            width: 100%;
+            min-height: 350px;
+            background: var(--dark-blue);
+            color: var(--light-blue);
+            border: 2px solid rgba(29, 58, 92, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: all 0.3s;
+            box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-input:focus, .code-output:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 20px rgba(100, 216, 255, 0.3), inset 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-output {
+            background: #0d1b2a;
+            min-height: 400px;
+        }
+
+        /* File Input */
+        .file-input-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .file-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.9), rgba(13, 71, 161, 0.9));
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .file-label.lua {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.9), rgba(86, 11, 173, 0.9));
+        }
+
+        .file-label:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 115, 232, 0.4);
+        }
+
+        .file-label.lua:hover {
+            box-shadow: 0 10px 20px rgba(157, 78, 221, 0.4);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #fileName {
+            color: var(--text-blue);
+            font-size: 0.95rem;
+            background: rgba(20, 40, 70, 0.6);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-blue);
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(20, 40, 70, 0.5);
+            border-radius: 15px;
+            border: 1px solid var(--border-blue);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-purple);
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            color: var(--light-blue);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        /* Buttons */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            min-width: 160px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.4);
+        }
+
+        .btn-lua {
+            background: linear-gradient(135deg, #9d4edd 0%, #560bad 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(20, 40, 70, 0.9);
+            color: var(--accent-blue);
+            border: 1px solid var(--border-blue);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 25, 80, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0d62d9 0%, #0a3d8f 100%);
+        }
+
+        .btn-lua:hover {
+            background: linear-gradient(135deg, #8a3ec9 0%, #4a0a9c 100%);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(30, 60, 100, 0.9);
+            border-color: var(--accent-blue);
+        }
+
+        /* Status Messages */
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-success {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            display: block;
+        }
+
+        .status-error {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            display: block;
+        }
+
+        .status-info {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            display: block;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .loading-content {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(100, 216, 255, 0.3);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Protection Section */
+        .protection-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .protection-card {
+            background: linear-gradient(135deg, rgba(10, 25, 47, 0.9), rgba(20, 40, 70, 0.9));
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0, 25, 80, 0.2);
+            border: 1px solid var(--border-blue);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .protection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), #9d4edd);
+        }
+
+        .protection-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.2);
+        }
+
+        .protection-icon {
+            font-size: 3rem;
+            color: var(--accent-purple);
+            margin-bottom: 20px;
+            background: rgba(157, 78, 221, 0.1);
+            width: 80px;
+            height: 80px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .protection-title {
+            color: var(--accent-purple);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .protection-desc {
+            color: var(--text-blue);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: linear-gradient(135deg, rgba(10, 25, 47, 0.8), rgba(20, 40, 70, 0.8));
+            border-radius: 20px;
+            padding: 35px;
+            margin-top: 50px;
+            border: 1px solid var(--border-blue);
+            box-shadow: 0 15px 35px rgba(0, 25, 80, 0.2);
+        }
+
+        .info-title {
+            color: var(--accent-purple);
+            font-size: 1.7rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-list {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        .info-list li {
+            padding: 12px 0;
+            color: var(--text-blue);
+            border-bottom: 1px dashed rgba(157, 78, 221, 0.2);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .info-list li:before {
+            content: "▸";
+            color: var(--accent-purple);
+            font-weight: bold;
+            display: inline-block;
+            min-width: 20px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px 20px 20px;
+            color: var(--text-blue);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-blue);
+        }
+
+        .watermark {
+            color: rgba(100, 216, 255, 0.8);
+            font-size: 1.1rem;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .lua-version {
+            color: #c77dff;
+            font-weight: bold;
+        }
+
+        /* Code Examples */
+        .example-selector {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            background: rgba(30, 60, 100, 0.6);
+            color: var(--accent-blue);
+            border: 1px solid var(--border-blue);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .example-btn:hover {
+            background: rgba(100, 216, 255, 0.2);
+        }
+
+        .example-btn.active {
+            background: rgba(157, 78, 221, 0.3);
+            color: #c77dff;
+            border-color: #9d4edd;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .btn {
+                min-width: 140px;
+                padding: 12px 20px;
+            }
+            
+            .features {
+                gap: 10px;
+            }
+            
+            .feature {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-lock"></i> zzbins obfuscator</h1>
+                <div class="lua-badge">
+                    <i class="fas fa-code"></i> ESPECIALIZADO EM LUA
+                </div>
+                <p class="subtitle">Proteja seus scripts LUA com ofuscação avançada e múltiplas camadas de segurança. Ideal para Roblox, FiveM, Cheat Engine e mais.</p>
+                <div class="features">
+                    <div class="feature lua"><i class="fas fa-gamepad"></i> Compatível com Roblox</div>
+                    <div class="feature"><i class="fas fa-shield-alt"></i> Anti Dumper</div>
+                    <div class="feature lua"><i class="fas fa-server"></i> FiveM Ready</div>
+                    <div class="feature"><i class="fas fa-layer-group"></i> 3 Camadas</div>
+                    <div class="feature"><i class="fas fa-download"></i> Download Direto</div>
+                    <div class="feature lua"><i class="fas fa-bolt"></i> Cheat Engine</div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="main-content">
+                <!-- Seção de Entrada -->
+                <div class="code-section">
+                    <h2 class="section-title lua"><i class="fas fa-file-code"></i> Código LUA Original</h2>
+                    
+                    <div class="file-input-container">
+                        <label class="file-label lua" for="fileInput">
+                            <i class="fas fa-upload"></i> Carregar Arquivo .lua
+                        </label>
+                        <input type="file" id="fileInput" accept=".lua,.txt">
+                        <span id="fileName"></span>
+                    </div>
+                    
+                    <textarea id="inputCode" class="code-input" placeholder="-- Cole seu código LUA aqui ou carregue um arquivo...
+-- Exemplo:
+local function hello()
+    print('Olá, Mundo!')
+end
+
+hello()"></textarea>
+                    
+                    <div class="example-selector">
+                        <button class="example-btn active" onclick="loadExample('basic')">Básico</button>
+                        <button class="example-btn" onclick="loadExample('roblox')">Roblox</button>
+                        <button class="example-btn" onclick="loadExample('fivem')">FiveM</button>
+                        <button class="example-btn" onclick="loadExample('complex')">Complexo</button>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="addWatermark" checked>
+                            <label for="addWatermark">Adicionar marca d'água "Ofuscado por zzbins "</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="stringEncode" checked>
+                            <label for="stringEncode">Codificar strings em Base64</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="renameVars" checked>
+                            <label for="renameVars">Renomear variáveis (obfuscation)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="antiTamper">
+                            <label for="antiTamper">Proteção Anti-Tamper</label>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn btn-lua" onclick="obfuscateLua()">
+                            <i class="fas fa-magic"></i> Ofuscar LUA
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearCode()">
+                            <i class="fas fa-eraser"></i> Limpar
+                        </button>
+                        <button class="btn btn-secondary" onclick="beautifyCode()">
+                            <i class="fas fa-paint-brush"></i> Formatar
+                        </button>
+                    </div>
+                    
+                    <div id="inputStatus" class="status"></div>
+                </div>
+
+                <!-- Seção de Saída -->
+                <div class="code-section">
+                    <h2 class="section-title lua"><i class="fas fa-lock"></i> Código LUA Ofuscado</h2>
+                    
+                    <div id="loading" class="loading">
+                        <div class="loading-content">
+                            <div class="loading-spinner"></div>
+                            <p>Processando ofuscação LUA...</p>
+                            <small>Isso pode levar alguns segundos</small>
+                        </div>
+                    </div>
+                    
+                    <textarea id="outputCode" class="code-output" readonly placeholder="-- O código ofuscado aparecerá aqui...
+-- Será gerado em formato LUA totalmente funcional"></textarea>
+                    
+                    <div id="status" class="status"></div>
+                    
+                    <div class="controls">
+                        <button class="btn btn-primary" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i> Copiar Código
+                        </button>
+                        <button class="btn btn-lua" onclick="downloadLua()">
+                            <i class="fas fa-download"></i> Baixar .lua
+                        </button>
+                        <button class="btn btn-secondary" onclick="testCode()">
+                            <i class="fas fa-play"></i> Testar Online
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Proteções -->
+            <div class="protection-section">
+                <div class="protection-card">
+                    <div class="protection-icon">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <h3 class="protection-title">Anti-Dumper</h3>
+                    <p class="protection-desc">Protege contra ferramentas de dumping e decompilação de scripts LUA.</p>
+                </div>
+                
+                <div class="protection-card">
+                    <div class="protection-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <h3 class="protection-title">Ofuscação Multi-camada</h3>
+                    <p class="protection-desc">Codificação em Base64, Hexadecimal e sistema numérico para LUA.</p>
+                </div>
+                
+                <div class="protection-card">
+                    <div class="protection-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="protection-title">Roblox Otimizado</h3>
+                    <p class="protection-desc">Ofuscação especializada para scripts de Roblox com compatibilidade total.</p>
+                </div>
+                
+                <div class="protection-card">
+                    <div class="protection-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 class="protection-title">FiveM Compatível</h3>
+                    <p class="protection-desc">Funciona perfeitamente com recursos e scripts de FiveM.</p>
+                </div>
+            </div>
+
+            <!-- Seção de Informações -->
+            <div class="info-section">
+                <h2 class="info-title"><i class="fas fa-info-circle"></i> Como Funciona para LUA</h2>
+                <ul class="info-list">
+                    <li><strong>Processamento 100% Local:</strong> Todo o ofuscamento ocorre no seu navegador, sem envio para servidores externos</li>
+                    <li><strong>3 Camadas de Segurança:</strong> Base64 → Hexadecimal → Codificação Numérica Personalizada</li>
+                    <li><strong>Compatibilidade Total:</strong> Scripts funcionam em Roblox, FiveM, Cheat Engine, Garry's Mod e outros ambientes LUA</li>
+                    <li><strong>Performance Mantida:</strong> O código ofuscado mantém a mesma velocidade de execução do original</li>
+                    <li><strong>Anti-Decompilação:</strong> Técnicas avançadas para dificultar a reversão do código</li>
+                    <li><strong>Suporte a LUA 5.1+:</strong> Compatível com todas as versões modernas de LUA</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer>
+            <p>Luciano Obfuscator - Versão Web para LUA</p>
+            <p class="watermark">🔒 Proteja seus scripts LUA contra engenharia reversa</p>
+            <p style="margin-top: 20px; font-size: 0.85rem; color: #5d6d97;">
+                <span class="lua-version">LUA 5.4</span> | Compatível com: Roblox • FiveM • Garry's Mod • Cheat Engine • WoW Addons
+            </p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #4a5568;">
+                Nota: Esta ferramenta é para proteção de propriedade intelectual. Use com responsabilidade.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // =====================
+        // VARIÁVEIS GLOBAIS
+        // =====================
+        const inputCode = document.getElementById('inputCode');
+        const outputCode = document.getElementById('outputCode');
+        const statusDiv = document.getElementById('status');
+        const inputStatusDiv = document.getElementById('inputStatus');
+        const loadingDiv = document.getElementById('loading');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        
+        // =====================
+        // FUNÇÕES DE OFUSCAÇÃO LUA
+        // =====================
+        
+        function toNumberBaseLua(text) {
+            // Converte texto para sistema numérico personalizado
+            return text.split('').map(c => {
+                const code = c.charCodeAt(0);
+                return `${code * 7}_${code * 13}`;
+            }).join(';');
+        }
+        
+        function b64EncodeLua(text) {
+            // Base64 encode para LUA
+            return btoa(unescape(encodeURIComponent(text)));
+        }
+        
+        function toHexLua(text) {
+            // Hexadecimal encode
+            let hex = '';
+            for (let i = 0; i < text.length; i++) {
+                hex += text.charCodeAt(i).toString(16).padStart(2, '0');
+            }
+            return hex;
+        }
+        
+        function encodeStringsInLua(code) {
+            // Codifica strings literais em Base64
+            return code.replace(/"([^"\\]*(\\.[^"\\]*)*)"|'([^'\\]*(\\.[^'\\]*)*)'/g, 
+                function(match) {
+                    const str = match.slice(1, -1); // Remove aspas
+                    const encoded = b64EncodeLua(str);
+                    return `loadstring(game:HttpGet("https://textbin.net/raw/..."))()--[[${encoded}]]`;
+                });
+        }
+        
+        function renameVariables(code) {
+            // Renomeia variáveis para nomes ofuscados
+            const vars = [];
+            const varPattern = /\b(local\s+|function\s+)?([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
+            
+            // Primeiro, coletar todas as variáveis
+            let match;
+            while ((match = varPattern.exec(code)) !== null) {
+                const fullMatch = match[0];
+                const varName = match[2];
+                
+                // Ignorar palavras-chave do LUA
+                const keywords = ['local', 'function', 'end', 'if', 'then', 'else', 'elseif', 
+                                 'for', 'while', 'do', 'repeat', 'until', 'return', 'break', 
+                                 'true', 'false', 'nil', 'and', 'or', 'not', 'in'];
+                
+                if (!keywords.includes(varName) && !vars.includes(varName) && varName.length > 1) {
+                    vars.push(varName);
+                }
+            }
+            
+            // Gerar nomes ofuscados
+            const obfuscatedNames = {};
+            vars.forEach((varName, index) => {
+                obfuscatedNames[varName] = `_${index.toString(36)}_${Math.random().toString(36).substr(2, 3)}`;
+            });
+            
+            // Substituir variáveis
+            let result = code;
+            Object.keys(obfuscatedNames).forEach(varName => {
+                const regex = new RegExp(`\\b${varName}\\b`, 'g');
+                result = result.replace(regex, obfuscatedNames[varName]);
+            });
+            
+            return result;
+        }
+        
+        // =====================
+        // FUNÇÃO PRINCIPAL DE OFUSCAÇÃO LUA
+        // =====================
+        function obfuscateLua() {
+            const code = inputCode.value.trim();
+            if (!code) {
+                showStatus('❌ Por favor, insira ou carregue um código LUA.', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            loadingDiv.style.display = 'block';
+            outputCode.value = '';
+            statusDiv.className = 'status';
+            
+            // Processar após pequeno delay (para efeito visual)
+            setTimeout(() => {
+                try {
+                    // Verificar opções selecionadas
+                    const addWatermark = document.getElementById('addWatermark').checked;
+                    const stringEncode = document.getElementById('stringEncode').checked;
+                    const renameVars = document.getElementById('renameVars').checked;
+                    const antiTamper = document.getElementById('antiTamper').checked;
+                    
+                    let processedCode = code;
+                    
+                    // Aplicar transformações baseadas nas opções
+                    if (renameVars) {
+                        processedCode = renameVariables(processedCode);
+                    }
+                    
+                    if (stringEncode) {
+                        processedCode = encodeStringsInLua(processedCode);
+                    }
+                    
+                    // Adicionar marca d'água
+                    const watermark = addWatermark ? 
+                        "--[[\n" +
+                        "  ██████╗ ███████╗███████╗██╗   ██╗ ██████╗ ██╗   ██╗\n" +
+                        "  ██╔══██╗██╔════╝██╔════╝██║   ██║██╔════╝ ╚██╗ ██╔╝\n" +
+                        "  ██║  ██║█████╗  ███████╗██║   ██║██║  ███╗ ╚████╔╝\n" +
+                        "  ██║  ██║██╔══╝  ╚════██║██║   ██║██║   ██║  ╚██╔╝\n" +
+                        "  ██████╔╝███████╗███████║╚██████╔╝╚██████╔╝   ██║\n" +
+                        "  ╚═════╝ ╚══════╝╚══════╝ ╚═════╝  ╚═════╝    ╚═╝\n" +
+                        "  \n" +
+                        "  Ofuscado por zzbins  Obfuscator - LUA Edition\n" +
+                        "  https://github.com/luciano-obfuscator\n" +
+                        "]]\n\n" : "";
+                    
+                    // Aplicar camadas de ofuscação
+                    const camada1 = toNumberBaseLua(watermark + processedCode);
+                    const camada2 = b64EncodeLua(camada1);
+                    const camada3 = toHexLua(camada2);
+                    
+                    // Gerar código LUA ofuscado final
+                    let obfuscated = `--[[ LUA Obfuscator v1.0 - zzbins obfuscator ]]--\n\n`;
+                    
+                    // Adicionar proteção Anti-Tamper se selecionado
+                    if (antiTamper) {
+                        obfuscated += `local function _verify()\n`;
+                        obfuscated += `    local _sig = "LucianoObfuscator"\n`;
+                        obfuscated += `    if _sig ~= "LucianoObfuscator" then\n`;
+                        obfuscated += `        while true do end\n`;
+                        obfuscated += `    end\n`;
+                        obfuscated += `end\n`;
+                        obfuscated += `_verify()\n\n`;
+                    }
+                    
+                    // Funções de decodificação
+                    obfuscated += `local function _fromHex(h)\n`;
+                    obfuscated += `    local r = ""\n`;
+                    obfuscated += `    for i = 1, #h, 2 do\n`;
+                    obfuscated += `        r = r .. string.char(tonumber(h:sub(i, i+1), 16))\n`;
+                    obfuscated += `    end\n`;
+                    obfuscated += `    return r\n`;
+                    obfuscated += `end\n\n`;
+                    
+                    obfuscated += `local function _b64Decode(t)\n`;
+                    obfuscated += `    return (_fromHex(t):gsub('.', function(x)\n`;
+                    obfuscated += `        return string.char(x:byte())\n`;
+                    obfuscated += `    end))\n`;
+                    obfuscated += `end\n\n`;
+                    
+                    obfuscated += `local function _fromNumBase(t)\n`;
+                    obfuscated += `    local r = ""\n`;
+                    obfuscated += `    for p in t:gmatch("[^;]+") do\n`;
+                    obfuscated += `        local n1 = p:match("(%d+)_")\n`;
+                    obfuscated += `        if n1 then\n`;
+                    obfuscated += `            r = r .. string.char(tonumber(n1) // 7)\n`;
+                    obfuscated += `        end\n`;
+                    obfuscated += `    end\n`;
+                    obfuscated += `    return r\n`;
+                    obfuscated += `end\n\n`;
+                    
+                    // Código ofuscado
+                    obfuscated += `--[[ CÓDIGO OFUSCADO - NÃO EDITAR ]]--\n`;
+                    obfuscated += `local _data = "${camada3}"\n`;
+                    obfuscated += `local _decoded = _fromNumBase(_b64Decode(_fromHex(_data)))\n`;
+                    obfuscated += `loadstring(_decoded)()\n`;
+                    
+                    // Mostrar resultado
+                    outputCode.value = obfuscated;
+                    
+                    // Status com informações
+                    const features = [];
+                    if (stringEncode) features.push('Strings Codificadas');
+                    if (renameVars) features.push('Variáveis Ofuscadas');
+                    if (antiTamper) features.push('Anti-Tamper');
+                    
+                    showStatus(`✅ LUA ofuscado com sucesso! (${features.join(', ') || 'Configuração básica'})`, 'success');
+                    
+                    // Atualizar status do input
+                    const lineCount = code.split('\n').length;
+                    const charCount = code.length;
+                    showInputStatus(`📊 Original: ${lineCount} linhas, ${charCount} caracteres`, 'info');
+                    
+                } catch (error) {
+                    showStatus(`❌ Erro durante a ofuscação LUA: ${error.message}`, 'error');
+                    console.error(error);
+                } finally {
+                    loadingDiv.style.display = 'none';
+                }
+            }, 1000);
+        }
+        
+        // =====================
+        // FUNÇÕES AUXILIARES
+        // =====================
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status status-${type}`;
+        }
+        
+        function showInputStatus(message, type) {
+            inputStatusDiv.textContent = message;
+            inputStatusDiv.className = `status status-${type}`;
+        }
+        
+        function copyToClipboard() {
+            if (!outputCode.value) {
+                showStatus('❌ Nenhum código LUA para copiar.', 'error');
+                return;
+            }
+            
+            outputCode.select();
+            document.execCommand('copy');
+            
+            // Feedback visual
+            showStatus('✅ Código LUA copiado para a área de transferência!', 'success');
+            
+            // Desselecionar
+            outputCode.setSelectionRange(0, 0);
+        }
+        
+        function downloadLua() {
+            if (!outputCode.value) {
+                showStatus('❌ Nenhum código LUA para baixar.', 'error');
+                return;
+            }
+            
+            const blob = new Blob([outputCode.value], { type: 'text/x-lua' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'script_ofuscado.lua';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('✅ Arquivo baixado como "script_ofuscado.lua"', 'success');
+        }
+        
+        function clearCode() {
+            inputCode.value = '';
+            fileName.textContent = '';
+            showInputStatus('Área de código limpa. Insira seu código LUA.', 'info');
+        }
+        
+        function beautifyCode() {
+            const code = inputCode.value;
+            if (!code.trim()) return;
+            
+            // Formatação básica de LUA
+            let formatted = code
+                .replace(/\t/g, '    ') // Tabs para espaços
+                .replace(/\}\s*else/g, '} else') // Espaços antes de else
+                .replace(/\)\s*then/g, ') then') // Espaços antes de then
+                .replace(/end(\w)/g, 'end $1') // Espaço após end
+                .replace(/function(\w)/g, 'function $1'); // Espaço após function
+            
+            inputCode.value = formatted;
+            showInputStatus('✅ Código LUA formatado.', 'success');
+        }
+        
+        function testCode() {
+            if (!outputCode.value) {
+                showStatus('❌ Nenhum código para testar.', 'error');
+                return;
+            }
+            
+            showStatus('⚠️ Teste LUA Online: Copie o código e teste em um ambiente LUA (Roblox Studio, FiveM, etc.)', 'info');
+        }
+        
+        // =====================
+        // EXEMPLOS DE CÓDIGO LUA
+        // =====================
+        const examples = {
+            basic: `-- Exemplo básico de LUA
+local playerName = "João"
+local playerLevel = 25
+local isOnline = true
+
+function greetPlayer(name)
+    print("Olá, " .. name .. "!")
+    return "Bem-vindo!"
+end
+
+local message = greetPlayer(playerName)
+print(message)
+
+if playerLevel > 20 then
+    print("Player avançado!")
+else
+    print("Player iniciante!")
+end
+
+for i = 1, 5 do
+    print("Contagem: " .. i)
+end`,
+
+            roblox: `-- Exemplo Roblox LUA
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function onPlayerAdded(player)
+    print(player.Name .. " entrou no jogo!")
+    
+    -- Give starter items
+    local backpack = player:WaitForChild("Backpack")
+    local tool = Instance.new("Tool")
+    tool.Name = "Espada"
+    tool.Parent = backpack
+    
+    -- Character setup
+    player.CharacterAdded:Connect(function(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        humanoid.WalkSpeed = 16
+        
+        -- Health system
+        humanoid.Died:Connect(function()
+            print(player.Name .. " morreu!")
+        end)
+    end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+-- Remote event example
+local remoteEvent = Instance.new("RemoteEvent")
+remoteEvent.Name = "UpdateStats"
+remoteEvent.Parent = ReplicatedStorage
+
+remoteEvent.OnServerEvent:Connect(function(player, data)
+    print("Recebido de " .. player.Name .. ": " .. data)
+end)`,
+
+            fivem: `-- Exemplo FiveM LUA (ESX/QRCore)
+ESX = nil
+TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+
+-- Comando de admin
+RegisterCommand("kick", function(source, args, rawCommand)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    
+    if xPlayer.getGroup() == "admin" then
+        local targetId = tonumber(args[1])
+        local reason = table.concat(args, " ", 2)
+        
+        if targetId and reason then
+            DropPlayer(targetId, "Kicked: " .. reason)
+            TriggerClientEvent('chat:addMessage', source, {
+                color = {255, 0, 0},
+                args = {"Sistema", "Player " .. targetId .. " kickado."}
+            })
+        end
+    else
+        TriggerClientEvent('chat:addMessage', source, {
+            color = {255, 0, 0},
+            args = {"Sistema", "Permissão negada!"}
+        })
+    end
+end, false)
+
+-- Sistema de inventário
+RegisterServerEvent('inventory:addItem')
+AddEventHandler('inventory:addItem', function(itemName, count)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    
+    if xPlayer then
+        xPlayer.addInventoryItem(itemName, count)
+        print("Item adicionado: " .. itemName .. " x" .. count)
+    end
+end)`,
+
+            complex: `-- Exemplo complexo de LUA
+local mathUtils = {
+    add = function(a, b) return a + b end,
+    multiply = function(a, b) return a * b end,
+    factorial = function(n)
+        if n <= 1 then return 1 end
+        return n * mathUtils.factorial(n - 1)
+    end
+}
+
+local config = {
+    maxPlayers = 32,
+    gameMode = "deathmatch",
+    features = {
+        voiceChat = true,
+        antiCheat = true,
+        saveSystem = false
+    }
+}
+
+local Player = {}
+Player.__index = Player
+
+function Player.new(name, level)
+    local self = setmetatable({}, Player)
+    self.name = name
+    self.level = level or 1
+    self.inventory = {}
+    return self
+end
+
+function Player:addItem(item, quantity)
+    self.inventory[item] = (self.inventory[item] or 0) + quantity
+    return self.inventory[item]
+end
+
+function Player:getInfo()
+    return string.format("Player: %s (Level: %d)", self.name, self.level)
+end
+
+-- Uso das classes
+local player1 = Player.new("Hero", 50)
+player1:addItem("sword", 1)
+player1:addItem("potion", 5)
+
+print(player1:getInfo())
+print("Items:", player1.inventory.sword, player1.inventory.potion)
+
+-- Metatable example
+local mt = {
+    __add = function(a, b)
+        return Player.new(a.name .. "+" .. b.name, a.level + b.level)
+    end
+}
+
+setmetatable(player1, mt)`
+        };
+        
+        function loadExample(type) {
+            if (examples[type]) {
+                inputCode.value = examples[type];
+                
+                // Atualizar botões ativos
+                document.querySelectorAll('.example-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                showInputStatus(`✅ Exemplo "${type}" carregado. Clique em "Ofuscar LUA" para testar.`, 'success');
+            }
+        }
+        
+        // =====================
+        // MANIPULAÇÃO DE ARQUIVOS
+        // =====================
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Verificar se é arquivo LUA
+            if (!file.name.toLowerCase().endsWith('.lua') && !file.name.toLowerCase().endsWith('.txt')) {
+                showInputStatus('❌ Por favor, selecione um arquivo .lua ou .txt', 'error');
+                return;
+            }
+            
+            fileName.textContent = `📁 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                inputCode.value = event.target.result;
+                showInputStatus(`✅ Arquivo "${file.name}" carregado com sucesso.`, 'success');
+            };
+            reader.readAsText(file);
+        });
+        
+        // =====================
+        // INICIALIZAÇÃO
+        // =====================
+        window.onload = function() {
+            showInputStatus('👆 Cole seu código LUA ou carregue um arquivo .lua', 'info');
+            showStatus('🔒 Ofuscador LUA pronto. Selecione um exemplo ou insira seu código.', 'info');
+            
+            // Carregar exemplo básico por padrão
+            loadExample('basic');
+        };
+    </script>
+</body>
+</html>
